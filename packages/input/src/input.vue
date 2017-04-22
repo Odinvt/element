@@ -78,6 +78,7 @@
   import emitter from 'element-ui/src/mixins/emitter';
   import calcTextareaHeight from './calcTextareaHeight';
   import merge from 'element-ui/src/utils/merge';
+  import registerEvents from 'element-ui/src/utils/registerEvents';
 
   export default {
     name: 'ElInput',
@@ -89,7 +90,9 @@
     data() {
       return {
         currentValue: this.value,
-        textareaCalcStyle: {}
+        textareaCalcStyle: {},
+        userEvents: [], // [{event: "name", handler: () => {}}]
+        skipEvents: [] // ['focus', 'input', 'change', 'blur']
       };
     },
 
@@ -199,6 +202,14 @@
 
     mounted() {
       this.resizeTextarea();
+
+      registerEvents.init(this);
+
+      registerEvents.registerUserEvents(this, this.$el.querySelector(this.type !== 'textarea' ? 'input' : this.type));
+    },
+
+    beforeDestroy() {
+      registerEvents.unregisterUserEvents(this, this.$el.querySelector(this.type !== 'textarea' ? 'input' : this.type));
     }
   };
 </script>
